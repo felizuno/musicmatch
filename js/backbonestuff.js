@@ -39,10 +39,12 @@
 	Models.Round = Backbone.Model.extend({
 		defaults: function() {
 			// this.difficulty: '',  WHEN YOU MAKE A NEW ROUND, INITIALIZE IT WITH A DIFFICULTY ATTRIBUTE
-			this.id = MM.game.get('roundNumber');
 			// this.goal = MM.getGoal();
 			// this.filler = MM.getFiller(this.goal);
-			this.timer = 30;
+			return {
+				id: MM.game.get('roundNumber'),
+				timer: 30
+			};
 		},
 
 		initialize: function() {
@@ -56,12 +58,12 @@
 		changeTileBG: function() {},
 
 		countdown: function() {
-				if (this.timer >=1) {
-					this.timer--;
-					setTimeout(this.countdown, 1000);
+			var _timer = this.get('timer');
+				if (_timer >=1) {
+					this.set('timer', _timer - 1);
+					setTimeout(_.bind(this.countdown, this), 1000);
 				} else {
-					// THIS IS PROBS DUMB, WHEN THE CHANGE TRIGGERS AND THE timer = 0, JUST REACT TO THAT
-					//this.trigger('timeIsUp'); 
+					this.trigger('timeIsUp'); 
 				}
 		}
 	});
@@ -86,8 +88,8 @@
 		render: function() {},
 
 		updateTimer: function() {
-			console.log('$$$$');
-			$('.timer').text(this.model.timer);
+			//console.log('$$$$');
+			$('.timer').text(this.model.get('timer'));
 		},
 
 		animateFlip: function() {}
