@@ -29,5 +29,6 @@ class HelperHandler(webapp2.RequestHandler):
     self.response.out.write(template.render(path, {}))
 
 app = webapp2.WSGIApplication([
+  ('/helper.html', HelperHandler),
   ('/', MainHandler)
 ], debug=True)
