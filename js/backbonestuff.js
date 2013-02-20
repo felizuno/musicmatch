@@ -3,47 +3,57 @@
 
 	Models.MatchGame = Backbone.Model.extend({
 		defaults: function() {
-			this.top100 = [];
-			this.usedAlbums = [];
-			this.playerScore = 0;
-			this.playerWins = 0;
-			this.roundNumber = 1;
-			//this.difficulty: 'easy' SHOULD INITIALIZE WITH THE DIFFICULTY
+			return {
+				usedAlbums: [],
+				playerScore: 0,
+				playerWins: 0,
+				roundCount: 0,
+				difficulty: 'easy' //SHOULD INITIALIZE WITH THE DIFFICULTY
+			}
 		},
 		
 		initialize: function() { 
 			// THIS WILL BE INVOKED AUTOMATICALLY WHEN THE MODEL IS CREATED
-			this.on('change:round', function(model) {
-				alert('Round: ' + model.get('round')); // JUST FOR TESTING
-				// DON'T FORGET THAT THE VIEW CAN ALSO LISTEN FOR CHANGES TO THE MODEL
-				// SO THERE IS NO NEED TO DO ANY VIEW LISTENING HERE
+			this.on('change:roundCount', function(model) {
+				console.log('Round: ' + model.get('roundCount'));
 			});
 		},
 
-		getGoal: function() {
-			// MAKE A TEMPORARY ARRAY OF ALL THE ALBUMS IN this.top100 NOT ALREADY IN this.usedAlbums
-			// SET A TEMP VARIABLE TO A RANDOM ALBUM FROM THAT TEMP ARRAY
-			// THEN ADD THAT ALBUM TO this.usedAlbums
-			// THEN REMOVE ALL THE TRACKS EXCEPT THE ONE WE WANT AS THE SAMPLE
-			// THEN RETURN THAT ALBUM TO THE GAME
-		},
 
-		getFiller: function(gameGoal) {
-			// CREATE A TEMP ARRAY FOR THE ALBUMS ALREADY CHOSEN AS FILLER
-			// READ THE DIFFICULTY OF THE GAME AND USE A FOR LOOP TO MAKE SURE WE GENERATE THE RIGHT NUMBER OF FILLER ALBUMS
-			// IN THE LOOP, FIND A RANDOM ALBUM THAT'S NOT ALREADY BEEN CHOSEN AND DOESN'T MATCH THE gameGoal PARAM
-			// AFTER THE LOOP IS DONE, RETURN THE TEMP ARRAY OF FILLER ALBUMS
+		newRound: function() {
+		// getGoal: function() {
+		// 	// MAKE A TEMPORARY ARRAY OF ALL THE ALBUMS IN this.top100 NOT ALREADY IN this.usedAlbums
+		// 	// SET A TEMP VARIABLE TO A RANDOM ALBUM FROM THAT TEMP ARRAY
+		// 	// THEN ADD THAT ALBUM TO this.usedAlbums
+		// 	// THEN REMOVE ALL THE TRACKS EXCEPT THE ONE WE WANT AS THE SAMPLE
+		// 	// THEN RETURN THAT ALBUM TO THE GAME
+		// },
+
+		// getFiller: function(gameGoal) {
+		// 	// CREATE A TEMP ARRAY FOR THE ALBUMS ALREADY CHOSEN AS FILLER
+		// 	// READ THE DIFFICULTY OF THE GAME AND USE A FOR LOOP TO MAKE SURE WE GENERATE THE RIGHT NUMBER OF FILLER ALBUMS
+		// 	// IN THE LOOP, FIND A RANDOM ALBUM THAT'S NOT ALREADY BEEN CHOSEN AND DOESN'T MATCH THE gameGoal PARAM
+		// 	// AFTER THE LOOP IS DONE, RETURN THE TEMP ARRAY OF FILLER ALBUMS
+		// },
+			var newRoundNumber = (this.get('roundCount') + 1);
+			
+			this.round = new Models.Round({
+				roundNumber: newRoundNumber,
+				difficulty: this.get('difficulty')
+			});
+
+			this.set('roundCount', newRoundNumber);
 		}
 	});
 
 	Models.Round = Backbone.Model.extend({
 		defaults: function() {
-			// this.difficulty: '',  WHEN YOU MAKE A NEW ROUND, INITIALIZE IT WITH A DIFFICULTY ATTRIBUTE
-			// this.goal = MM.getGoal();
-			// this.filler = MM.getFiller(this.goal);
 			return {
-				id: MM.game.get('roundNumber'),
-				timer: 30
+			 // difficulty: '',  WHEN YOU MAKE A NEW ROUND, INITIALIZE IT WITH A DIFFICULTY ATTRIBUTE
+			 // featuredAlbum: {},
+			 // fillerAlbums: [],
+				timer: 30,
+				paused: true
 			};
 		},
 
@@ -52,12 +62,16 @@
 		},
 
 		getGameSong: function() {
-			return this.goal.tracks[0];
+			return this.get('featuredAlbum').tracks[0];
 		},
 
 		changeTileBG: function() {},
 
 		countdown: function() {
+			if (this.get('paused')) {
+				return;
+			}
+
 			var _timer = this.get('timer');
 				if (_timer >=1) {
 					this.set('timer', _timer - 1);
@@ -77,21 +91,22 @@
 		events: {
 			// THE CLICK EVENTS FROM ANY HTML ELEMENTS INVOLVED IN THE ROUND
 			// SHOULD BE HANDLED HERE
-			// i.e. - 'click .pause': 'pause'
+			//'click .tile': 'flip'
+			// 'click .pause': 'NOT SURE HOW I TELL THE MODEL?'
 		},
 
 		initialize: function() {
 			this.updateTimer();
 			this.listenTo(this.model, 'change:timer', this.updateTimer);
+			this.listenTo(this.model, 'timeIsUp', function() {_.bind(this.stopListening, this);});
 		},
 
 		render: function() {},
 
 		updateTimer: function() {
-			//console.log('$$$$');
 			$('.timer').text(this.model.get('timer'));
 		},
 
-		animateFlip: function() {}
+		animateFlip: function() {},
 	});
 })();
