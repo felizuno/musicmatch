@@ -95,8 +95,8 @@
 		events: {
 			// THE CLICK EVENTS FROM ANY HTML ELEMENTS INVOLVED IN THE ROUND
 			// SHOULD BE HANDLED HERE
-			//'click .tile': 'flip'
 			// 'click .pause': 'NOT SURE HOW I TELL THE MODEL?'
+			'click .tile': 'handleTileClick'
 		},
 
 		initialize: function() {
@@ -111,6 +111,8 @@
 			$('.timer').text(this.model.get('timer'));
 		},
 
-		animateFlip: function() {},
+		handleTileClick: function() {
+			this.model.set('STUFF');
+		},
 	});
 })();
