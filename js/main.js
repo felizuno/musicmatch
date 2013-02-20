@@ -9,10 +9,10 @@
 				model: MM.game.round,
 				el: $('#game')
 			});
-			
+
 	        R.ready(function() {
 	            R.request({
-	                method: getTopCharts,
+	                method: 'getTopCharts',
 	                content: {
 	                    type: 'Album',
 	                    count: 100,

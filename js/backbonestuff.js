@@ -17,6 +17,10 @@
 			this.on('change:roundCount', function(model) {
 				console.log('Round: ' + model.get('roundCount'));
 			});
+
+			this.on('change:top100', function(model) {
+				model.newRound();
+			})
 		},
 
 
